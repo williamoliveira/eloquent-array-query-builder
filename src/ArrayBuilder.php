@@ -24,34 +24,6 @@ class ArrayBuilder
      * @param Builder $query
      * @param array $arrayQuery
      *
-     * Needs an array in the example format:
-     *
-     *  $exampleArrayQuery = [
-     *      'where' => [
-     *          [
-     *              'name' => ['eq' => '%joao%']
-     *          ],
-     *          'created_at' => [
-     *              'between'  => [
-     *                   '2014-10-10',
-     *                   '2015-10-10'
-     *              ]
-     *          ],
-     *      ],
-     *      'fields' => ['id', 'name', 'created_at'], // the columns to bring
-     *      'order' => 'name'
-     *      'include' => [                            // relations, can have where, order and fields
-     *          'permissions',
-     *          'roles' => [
-     *              'where' => [
-     *                  'name' => 'admin'
-     *              ],
-     *              'order' => 'name DESC'
-     *              'fields' => ['id', 'name']
-     *          ]
-     *      ]
-     *  ];
-     *
      * @return mixed
      */
     public function apply(Builder &$query, array $arrayQuery)
