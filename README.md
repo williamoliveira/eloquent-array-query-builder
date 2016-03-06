@@ -46,8 +46,7 @@ $exampleArrayQuery = [
                  '2014-10-10',
                  '2015-10-10'
             ]
-        ],
-        'role.name' => 'admin'
+        ]
     ],
     'fields' => ['id', 'name', 'created_at'],
     'order' => 'name',
@@ -69,7 +68,6 @@ The same query as a query string:
 /your-route?where[name][like]=%joao%
 &where[created_at][between][]=2014-10-10
 &where[created_at][between][]=2015-10-10
-&where[role.name]=admin
 &fields[]=id
 &fields[]=name
 &fields[]=created_at
