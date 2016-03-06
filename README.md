@@ -27,7 +27,7 @@ Example in a controller:
 Here is a example of what a query can look like:
 ```php
 $exampleArrayQuery = [
-        'where' => [
+    'where' => [
             [
                 'name' => ['like' => '%joao%']
         ],
