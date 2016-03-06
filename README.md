@@ -12,28 +12,26 @@ We let the wiring of the request to the model to you, so you can use it wherever
 
 Example in a controller:
 ```php
-    public function index(Request $request, \Williamoliveira\ArrayQueryBuilder\ArrayBuilder $arrayBuilder)
-    {
-        $query = User::query();
-        $query = $arrayBuilder->apply($query, $request->all());
-        
-        return $query->paginate($request->get('per_page')); // Note it does not do pagination,
-                                                            // you need to do it youserlf
-    }
+public function index(Request $request, \Williamoliveira\ArrayQueryBuilder\ArrayBuilder $arrayBuilder)
+{
+    $query = User::query();
+    $query = $arrayBuilder->apply($query, $request->all());
+    
+    return $query->paginate($request->get('per_page')); // Note it does not do pagination,
+                                                        // you need to do it youserlf
+}
 ```
 
 You can also use the ArrayQueryable trait in your model:
 ```php
+ // Model
+ class User extends Model{
+     use \Williamoliveira\ArrayQueryBuilder\ArrayQueryable;
+ // ...
 
-    // Model
-    class User extends Model{
-        use \Williamoliveira\ArrayQueryBuilder\ArrayQueryable;
-    // ...
-
-    // Usage
-    return User::arrayQuery($request->all())->get(); //static
-    return (new User())->newArrayQuery($request->all())->get(); //instance
-    
+ // Usage
+ return User::arrayQuery($request->all())->get(); //static
+ return (new User())->newArrayQuery($request->all())->get(); //instance
 ```
 
 #### Query format
