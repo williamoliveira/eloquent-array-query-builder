@@ -40,18 +40,14 @@ Here is a example of what a query can look like:
 ```php
 $exampleArrayQuery = [
     'where' => [
-            [
-                'name' => ['like' => '%joao%']
-        ],
+        'name' => ['like' => '%joao%'],
         'created_at' => [
             'between'  => [
                  '2014-10-10',
                  '2015-10-10'
             ]
         ],
-        [
-            'role.name' => 'admin'
-        ]
+        'role.name' => 'admin'
     ],
     'fields' => ['id', 'name', 'created_at'],
     'order' => 'name',
@@ -61,8 +57,8 @@ $exampleArrayQuery = [
             'where' => [
                 'name' => 'admin'
             ],
-            'order' => 'name DESC',
-            'fields' => ['id', 'name']
+            'fields' => ['id', 'name'],
+            'order' => 'name DESC'
         ]
     ]
 ];
@@ -80,7 +76,7 @@ The same query as a query string:
 &order=name
 &include[permissions]=true
 &include[roles][where][name]=admin
-&include[roles][order]=name DESC
 &include[roles][fields][]=id
 &include[roles][fields][]=name
+&include[roles][order]=name DESC
 ```
