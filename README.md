@@ -8,11 +8,11 @@ So you can have easy to use filters to filter your data, without the need to wri
 
 ## How to use
 
-We let the wiring of the request to the model to you, so you can use it where you want
+We let the wiring of the request to the model to you, so you can use it wherever you want.
 
 Example in a controller:
 ```php
-    public function index(Request $request, ArrayBuilder $arrayBuilder)
+    public function index(Request $request, \Williamoliveira\ArrayQueryBuilder\ArrayBuilder $arrayBuilder)
     {
         $query = User::query();
         $query = $arrayBuilder->apply($query, $request->all());
@@ -20,6 +20,20 @@ Example in a controller:
         return $query->paginate($request->get('per_page')); // Note it does not do pagination,
                                                             // you need to do it youserlf
     }
+```
+
+You can also use the ArrayQueryable trait in your model:
+```php
+
+    // Model
+    class User extends Model{
+        use \Williamoliveira\ArrayQueryBuilder\ArrayQueryable;
+    // ...
+
+    // Usage
+    return User::arrayQuery($request->all())->get(); //static
+    return (new User())->newArrayQuery($request->all())->get(); //instance
+    
 ```
 
 #### Query format
@@ -44,7 +58,7 @@ $exampleArrayQuery = [
     'fields' => ['id', 'name', 'created_at'],
     'order' => 'name',
     'include' => [                            // relations, can have where, order and fields
-        'permissions',
+        'permissions' => true,
         'roles' => [
             'where' => [
                 'name' => 'admin'
@@ -56,19 +70,19 @@ $exampleArrayQuery = [
 ];
 ```
 
-The same query on a query string:
+The same query as a query string:
 ```
-/your-route?where[0][name][like]=%joao%
-&where[created_at][between][0]=2014-10-10
-&where[created_at][between][1]=2015-10-10
-&where[1][role.name]=admin
-&fields[0]=id
-&fields[1]=name
-&fields[2]=created_at
+/your-route?where[name][like]=%joao%
+&where[created_at][between][]=2014-10-10
+&where[created_at][between][]=2015-10-10
+&where[role.name]=admin
+&fields[]=id
+&fields[]=name
+&fields[]=created_at
 &order=name
-&include[0]=permissions
+&include[permissions]=true
 &include[roles][where][name]=admin
 &include[roles][order]=name DESC
-&include[roles][fields][0]=id
-&include[roles][fields][1]=name
+&include[roles][fields][]=id
+&include[roles][fields][]=name
 ```

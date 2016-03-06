@@ -1,15 +1,28 @@
 <?php
+
 namespace Williamoliveira\ArrayQueryBuilder;
 
 trait ArrayQueryable
 {
+
     /**
      * @param array $arrayQuery
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function arrayQuery(array $arrayQuery)
+    public static function arrayQuery(array $arrayQuery)
     {
-        $query = $this->query();
+        $query = static::query();
+
+        return (new ArrayBuilder())->apply($query, $arrayQuery);
+    }
+
+    /**
+     * @param array $arrayQuery
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newArrayQuery(array $arrayQuery)
+    {
+        $query = $this->newQuery();
 
         return (new ArrayBuilder())->apply($query, $arrayQuery);
     }

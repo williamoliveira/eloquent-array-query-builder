@@ -1,4 +1,6 @@
-<?php namespace Williamoliveira\ArrayQueryBuilder;
+<?php
+
+namespace Williamoliveira\ArrayQueryBuilder;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -189,8 +191,16 @@ class ArrayBuilder
         });
     }
 
+    /**
+     * @param string $operator
+     * @return string
+     */
     protected function parseOperator($operator)
     {
-        return strtolower($this->aliases[$operator] ?: $operator);
+        $operator = array_key_exists($operator, $this->aliases)
+            ? $this->aliases[$operator]
+            : $operator;
+
+        return strtolower($operator);
     }
 }
