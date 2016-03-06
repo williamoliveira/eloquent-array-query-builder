@@ -1,0 +1,19 @@
+{
+    "name": "williamoliveira/eloquent-array-query-builder",
+    "description": "Query Laravel Eloquent with and array",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "William Oliveira",
+            "email": "william.oliveir4@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/database": "~5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Williamoliveira\\ArrayQueryBuilder\\": "src/"
+        }
+    }
+}
