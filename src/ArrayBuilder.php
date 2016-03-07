@@ -63,6 +63,7 @@ class ArrayBuilder
             }
 
             $whereOperator = is_array($where) ? array_keys($where)[0] : '=';
+            $whereOperator = $this->parseOperator($whereOperator);
             $whereValue = is_array($where) ? $where[$whereOperator] : $where;
 
             $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue);
@@ -79,8 +80,6 @@ class ArrayBuilder
      */
     protected function buildWhere(&$queryBuilder, $field, $operator, $value)
     {
-        $operator = $this->parseOperator($operator);
-
         if (strpos($field, '.') > -1) {
             $this->buildWhereHas($queryBuilder, $field, $operator, $value);
             return;

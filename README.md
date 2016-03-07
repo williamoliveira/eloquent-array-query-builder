@@ -1,10 +1,10 @@
-## Install
-
-`composer require williamoliveira/eloquent-array-query-builder`
-
 ## Why this nonsence?
 
 So you can have easy to use filters to filter your data, without the need to write long conditional queries by hand, very useful for APIs.
+
+## How to install
+
+`composer require williamoliveira/eloquent-array-query-builder:dev-master`
 
 ## How to use
 
