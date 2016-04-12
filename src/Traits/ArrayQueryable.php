@@ -1,6 +1,6 @@
 <?php
 
-namespace Williamoliveira\ArrayQueryBuilder;
+namespace Williamoliveira\ArrayQueryBuilder\Traits;
 
 trait ArrayQueryable
 {

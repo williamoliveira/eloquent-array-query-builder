@@ -63,8 +63,9 @@ class ArrayBuilder
             }
 
             $whereOperator = is_array($where) ? array_keys($where)[0] : '=';
-            $whereOperator = $this->parseOperator($whereOperator);
             $whereValue = is_array($where) ? $where[$whereOperator] : $where;
+            
+            $whereOperator = $this->parseOperator($whereOperator);
 
             $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue);
         }
