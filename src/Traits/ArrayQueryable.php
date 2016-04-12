@@ -2,6 +2,8 @@
 
 namespace Williamoliveira\ArrayQueryBuilder\Traits;
 
+use Williamoliveira\ArrayQueryBuilder\ArrayBuilder;
+
 trait ArrayQueryable
 {
 
