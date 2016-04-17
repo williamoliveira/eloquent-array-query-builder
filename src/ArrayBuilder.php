@@ -2,6 +2,7 @@
 
 namespace Williamoliveira\ArrayQueryBuilder;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -62,15 +63,25 @@ class ArrayBuilder
                 return;
             }
 
+            if(is_array($where)){
+                foreach ($where as $whereOperator => $whereValue) {
+                    $whereOperator = $this->parseOperator($whereOperator);
+                    $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue);
+                }
+
+                return;
+            }
+
             $whereOperator = is_array($where) ? array_keys($where)[0] : '=';
             $whereValue = is_array($where) ? $where[$whereOperator] : $where;
-            
+
             $whereOperator = $this->parseOperator($whereOperator);
 
             $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue);
         }
 
     }
+
 
     /**
      * @param Builder|QueryBuilder $queryBuilder
@@ -85,7 +96,7 @@ class ArrayBuilder
             $this->buildWhereHas($queryBuilder, $field, $operator, $value);
             return;
         }
-
+        
         switch($operator){
             case 'between':
                 $queryBuilder->whereBetween($field, [$value[0], $value[1]]); return;
