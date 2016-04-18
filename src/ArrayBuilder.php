@@ -181,7 +181,7 @@ class ArrayBuilder
         $value = preg_replace('/\s\s+/', ' ', trim($value));
         $value = '%' . str_replace(' ', '%', $value) . '%';
 
-        $queryBuilder->where($field, 'like', $value);
+        $queryBuilder->where($field, 'ilike', $value);
     }
 
     /**
