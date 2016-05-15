@@ -2,6 +2,7 @@
 
 namespace Williamoliveira\ArrayQueryBuilder;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -62,14 +63,25 @@ class ArrayBuilder
                 return;
             }
 
+            if(is_array($where)){
+                foreach ($where as $whereOperator => $whereValue) {
+                    $whereOperator = $this->parseOperator($whereOperator);
+                    $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue);
+                }
+
+                return;
+            }
+
             $whereOperator = is_array($where) ? array_keys($where)[0] : '=';
-            $whereOperator = $this->parseOperator($whereOperator);
             $whereValue = is_array($where) ? $where[$whereOperator] : $where;
+
+            $whereOperator = $this->parseOperator($whereOperator);
 
             $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue);
         }
 
     }
+
 
     /**
      * @param Builder|QueryBuilder $queryBuilder
@@ -84,7 +96,7 @@ class ArrayBuilder
             $this->buildWhereHas($queryBuilder, $field, $operator, $value);
             return;
         }
-
+        
         switch($operator){
             case 'between':
                 $queryBuilder->whereBetween($field, [$value[0], $value[1]]); return;
@@ -115,6 +127,23 @@ class ArrayBuilder
      * @param $order
      */
     protected function buildOrderBy(&$queryBuilder, $order)
+    {
+        if(is_array($order)){
+            foreach ($order as $orderItem) {
+                $this->buildOrderBySingle($queryBuilder, $orderItem);
+            }
+
+            return;
+        }
+
+        $this->buildOrderBySingle($queryBuilder, $order);
+    }
+
+    /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @param $order
+     */
+    protected function buildOrderBySingle(&$queryBuilder, $order)
     {
         $order = strtolower($order);
 
@@ -150,7 +179,7 @@ class ArrayBuilder
                 }
 
                 if (isset($include['order'])) {
-                    $this->buildOrderBy($query, $include['order']);
+                    $this->buildOrderBySingle($query, $include['order']);
                 }
 
             };
@@ -169,7 +198,7 @@ class ArrayBuilder
         $value = preg_replace('/\s\s+/', ' ', trim($value));
         $value = '%' . str_replace(' ', '%', $value) . '%';
 
-        $queryBuilder->where($field, 'like', $value);
+        $queryBuilder->where($field, 'ilike', $value);
     }
 
     /**
