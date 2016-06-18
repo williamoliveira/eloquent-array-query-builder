@@ -2,6 +2,8 @@
 
 So you can have easy to use filters to filter your data, without the need to write long conditional queries by hand, very useful for APIs.
 
+:warning: It still in alpha, isn't well tested and the API may change a bit so it's recommended to be used in production yet
+
 ## How to install
 
 `composer require williamoliveira/eloquent-array-query-builder:dev-master`
