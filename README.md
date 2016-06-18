@@ -78,3 +78,7 @@ The same query as a query string:
 &include[roles][fields][]=name
 &include[roles][order]=name DESC
 ```
+
+## Tips
+
+From a Javascript client you could use this package to convert query objects to query strings with ease: https://github.com/ljharb/qs
