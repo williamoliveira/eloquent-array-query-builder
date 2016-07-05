@@ -2,7 +2,6 @@
 
 namespace Williamoliveira\ArrayQueryBuilder;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
@@ -29,9 +28,9 @@ class ArrayBuilder
      * @param Builder $query
      * @param array $arrayQuery
      *
-     * @return mixed
+     * @return QueryBuilder
      */
-    public function apply(Builder &$query, array $arrayQuery)
+    public function apply($query, array $arrayQuery)
     {
 
         if (isset($arrayQuery['where'])) {
@@ -56,70 +55,97 @@ class ArrayBuilder
     /**
      * @param Builder|QueryBuilder $queryBuilder
      * @param array $wheres
+     * @param string $boolean
      */
-    protected function buildWheres(&$queryBuilder, array $wheres)
+    protected function buildWheres($queryBuilder, array $wheres, $boolean = 'and')
     {
         foreach ($wheres as $whereField => $where) {
 
             if (!isset($whereField) || !isset($where)) {
-                return;
+                continue;
+            }
+            
+            $whereField = strtolower($whereField);
+
+            // Nested OR where
+            // Example: 'or' => ['foo' => 'bar', 'x => 'y']
+            if($whereField === 'or'){
+                $queryBuilder->whereNested(function($queryBuilder) use ($where){
+                    $this->buildWheres($queryBuilder, $where, 'or');
+                }, $boolean);
+
+                continue;
             }
 
+            // Nested AND where
+            // Example: 'and' => ['foo' => 'bar', 'x => 'y']
+            if($whereField === 'and'){
+                $queryBuilder->whereNested(function($queryBuilder) use ($where){
+                    $this->buildWheres($queryBuilder, $where, 'and');
+                }, $boolean);
+
+                continue;
+            }
+
+            // Operator is present on query
+            // Example: 'foo' => ['like' => '%bar%']
             if(is_array($where)){
                 foreach ($where as $whereOperator => $whereValue) {
                     $whereOperator = $this->parseOperator($whereOperator);
-                    $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue);
+                    $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue, $boolean);
                 }
 
-                return;
+                continue;
             }
 
+            // Operator is omitted on query, assumes '='
+            // Example: 'foo' => 'bar'
             $whereOperator = is_array($where) ? array_keys($where)[0] : '=';
             $whereValue = is_array($where) ? $where[$whereOperator] : $where;
 
             $whereOperator = $this->parseOperator($whereOperator);
 
-            $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue);
+            $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue, $boolean);
         }
 
     }
-
 
     /**
      * @param Builder|QueryBuilder $queryBuilder
      * @param $field
      * @param $operator
      * @param $value
-     * @return void
+     * @param string $boolean
      */
-    protected function buildWhere(&$queryBuilder, $field, $operator, $value)
+    protected function buildWhere($queryBuilder, $field, $operator, $value, $boolean = 'and')
     {
         if (strpos($field, '.') > -1) {
-            $this->buildWhereHas($queryBuilder, $field, $operator, $value);
+            $this->buildWhereHas($queryBuilder, $field, $operator, $value, $boolean);
             return;
         }
         
         switch($operator){
             case 'between':
-                $queryBuilder->whereBetween($field, [$value[0], $value[1]]); return;
+                $queryBuilder->whereBetween($field, [$value[0], $value[1]], $boolean); return;
             case 'not null':
-                $queryBuilder->whereNotNull($field); return;
+                $queryBuilder->whereNotNull($field, $boolean); return;
             case 'in':
-                $queryBuilder->whereIn($field, (!is_array($value) ? [$value] : $value)); return;
+                $queryBuilder->whereIn($field, (!is_array($value) ? [$value] : $value), $boolean); return;
             case 'not in':
-                $queryBuilder->whereNotIn($field, (!is_array($value) ? [$value] : $value)); return;
+                $queryBuilder->whereNotIn($field, (!is_array($value) ? [$value] : $value), $boolean); return;
             case 'search':
-                $this->buildTextSearchWhere($queryBuilder, $field, $value); return;
+                $this->buildTextSearchWhere($queryBuilder, $field, $value, $boolean); return;
+            default:
+                $queryBuilder->where($field, $operator, $value, $boolean);
         }
 
-        $queryBuilder->where($field, $operator, $value);
     }
 
     /**
      * @param Builder|QueryBuilder $queryBuilder
      * @param array $columns
      */
-    protected function buildFields(&$queryBuilder, $columns = ['*'])
+    protected function buildFields($queryBuilder, $columns = ['*'])
     {
         $queryBuilder->select($columns);
     }
@@ -128,7 +154,7 @@ class ArrayBuilder
      * @param Builder|QueryBuilder $queryBuilder
      * @param $order
      */
-    protected function buildOrderBy(&$queryBuilder, $order)
+    protected function buildOrderBy($queryBuilder, $order)
     {
         if(is_array($order)){
             foreach ($order as $orderItem) {
@@ -145,7 +171,7 @@ class ArrayBuilder
      * @param Builder|QueryBuilder $queryBuilder
      * @param $order
      */
-    protected function buildOrderBySingle(&$queryBuilder, $order)
+    protected function buildOrderBySingle($queryBuilder, $order)
     {
         $order = strtolower($order);
 
@@ -159,7 +185,7 @@ class ArrayBuilder
      * @param Builder|QueryBuilder $queryBuilder
      * @param array $includes
      */
-    protected function buildIncludes(&$queryBuilder, array $includes)
+    protected function buildIncludes($queryBuilder, array $includes)
     {
         $builtIncludes = [];
 
@@ -181,7 +207,7 @@ class ArrayBuilder
                 }
 
                 if (isset($include['order'])) {
-                    $this->buildOrderBySingle($query, $include['order']);
+                    $this->buildOrderBy($query, $include['order']);
                 }
 
             };
@@ -194,13 +220,14 @@ class ArrayBuilder
      * @param Builder|QueryBuilder $queryBuilder
      * @param $field
      * @param $value
+     * @param string $boolean
      */
-    protected function buildTextSearchWhere(&$queryBuilder, $field, $value)
+    protected function buildTextSearchWhere($queryBuilder, $field, $value, $boolean = 'and')
     {
         $value = preg_replace('/\s\s+/', ' ', trim($value));
         $value = '%' . str_replace(' ', '%', $value) . '%';
 
-        $queryBuilder->where($field, $this->getILike($queryBuilder), $value);
+        $queryBuilder->where($field, $this->getILike($queryBuilder), $value, $boolean);
     }
 
     /**
@@ -208,16 +235,17 @@ class ArrayBuilder
      * @param $hasField
      * @param $operator
      * @param $value
+     * @param string $boolean
      */
-    protected function buildWhereHas(&$queryBuilder, $hasField, $operator, $value)
+    protected function buildWhereHas($queryBuilder, $hasField, $operator, $value, $boolean = 'and')
     {
         $reversedParts = explode('.', strrev($hasField), 2);
 
         $hasField = strrev($reversedParts[1]);
         $field = strrev($reversedParts[0]);
 
-        $queryBuilder->whereHas($hasField, function ($query) use ($queryBuilder, $field, $operator, $value) {
-            $this->buildWhere($query, $field, $operator, $value);
+        $queryBuilder->whereHas($hasField, function ($query) use ($queryBuilder, $field, $operator, $value, $boolean) {
+            $this->buildWhere($query, $field, $operator, $value, $boolean);
         });
     }
 
@@ -238,7 +266,7 @@ class ArrayBuilder
      * @param Builder|QueryBuilder $queryBuilder
      * @return string
      */
-    protected function getILike(&$queryBuilder)
+    protected function getILike($queryBuilder)
     {
         $grammar = $queryBuilder->getGrammar();
         
