@@ -2,8 +2,6 @@
 
 So you can have easy to use filters to filter your data, without the need to write long conditional queries by hand, very useful for APIs.
 
-:warning: It still in alpha, isn't well tested and the API may change a bit so it's recommended to be used in production yet
-
 ## How to install
 
 `composer require williamoliveira/eloquent-array-query-builder:dev-master`
@@ -48,6 +46,10 @@ $exampleArrayQuery = [
                  '2014-10-10',
                  '2015-10-10'
             ]
+        ],
+        'or' => [                             // nested boolean where clauses
+            'foo' => 'bar',
+            'baz' => 'qux'
         ]
     ],
     'fields' => ['id', 'name', 'created_at'],
@@ -70,6 +72,8 @@ The same query as a query string:
 /your-route?where[name][like]=%joao%
 &where[created_at][between][]=2014-10-10
 &where[created_at][between][]=2015-10-10
+$where[or][foo]=bar
+&where[or][baz]=qux
 &fields[]=id
 &fields[]=name
 &fields[]=created_at
@@ -80,7 +84,3 @@ The same query as a query string:
 &include[roles][fields][]=name
 &include[roles][order]=name DESC
 ```
-
-## Tips
-
-From a Javascript client you could use this package to convert query objects to query strings with ease: https://github.com/ljharb/qs
