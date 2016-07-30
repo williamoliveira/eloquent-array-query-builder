@@ -74,7 +74,7 @@ The same query as a query string:
 /your-route?where[name][like]=%joao%
 &where[created_at][between][]=2014-10-10
 &where[created_at][between][]=2015-10-10
-$where[or][foo]=bar
+&where[or][foo]=bar
 &where[or][baz]=qux
 &fields[]=id
 &fields[]=name
