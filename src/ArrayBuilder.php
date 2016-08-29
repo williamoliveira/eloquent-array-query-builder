@@ -191,6 +191,10 @@ class ArrayBuilder
 
         foreach ($includes as $includeName => $include) {
 
+            // Support for array includes, example: ['user', 'post']
+            // If it's a single dimension array the key will be numeric
+            $includeName = is_numeric($includeName) ? $include : $includeName;
+
             if (empty($include['where']) && empty($include['fields']) && empty($include['order'])) {
                 $builtIncludes[] = $includeName;
                 continue;
