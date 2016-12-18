@@ -4,6 +4,8 @@ namespace Williamoliveira\ArrayQueryBuilder;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Grammars\MySqlGrammar;
+use Illuminate\Database\Query\Grammars\PostgresGrammar;
 
 class ArrayBuilder
 {
@@ -234,7 +236,7 @@ class ArrayBuilder
         $value = preg_replace('/\s\s+/', ' ', trim($value));
         $value = '%' . str_replace(' ', '%', $value) . '%';
 
-        $queryBuilder->where($field, 'ilike', $value, $boolean);
+        $queryBuilder->where($field, $this->getILike($queryBuilder), $value, $boolean);
     }
 
     /**
@@ -269,4 +271,22 @@ class ArrayBuilder
         return strtolower($operator);
     }
 
+    /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @return string
+     */
+    protected function getILike($queryBuilder)
+    {
+        $grammar = $queryBuilder->getGrammar();
+
+        if($grammar instanceof MySqlGrammar){
+            return "COLLATE UTF8_GENERAL_CI LIKE";
+        }
+
+        if($grammar instanceof PostgresGrammar){
+            return "ilike";
+        }
+
+        return 'like';
+    }
 }
