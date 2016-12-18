@@ -1,4 +1,7 @@
-![Travis CI thingy](https://travis-ci.org/williamoliveira/eloquent-array-query-builder.svg?branch=master)
+[![Travis CI Build Status](https://travis-ci.org/williamoliveira/eloquent-array-query-builder.svg?branch=master)](https://travis-ci.org/williamoliveira/eloquent-array-query-builder)
+[![Latest Stable Version](https://poser.pugx.org/williamoliveira/eloquent-array-query-builder/v/stable)](https://packagist.org/packages/williamoliveira/eloquent-array-query-builder)
+[![Total Downloads](https://poser.pugx.org/williamoliveira/eloquent-array-query-builder/downloads)](https://packagist.org/packages/williamoliveira/eloquent-array-query-builder)
+[![License](https://poser.pugx.org/williamoliveira/eloquent-array-query-builder/license)](https://packagist.org/packages/williamoliveira/eloquent-array-query-builder)
 
 ## Why this nonsence?
 
