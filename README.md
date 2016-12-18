@@ -1,3 +1,5 @@
+![Travis CI thingy](https://travis-ci.org/williamoliveira/eloquent-array-query-builder.svg?branch=master)
+
 ## Why this nonsence?
 
 So you can have easy to use filters to filter your data, without the need to write long conditional queries by hand, very useful for APIs.
