@@ -33,7 +33,7 @@ class ArrayBuilder
     public function apply($query, array $arrayQuery)
     {
         if (isset($arrayQuery['include'])) {
-            if($query instanceof QueryBuilder){
+            if ($query instanceof QueryBuilder) {
                 throw new \InvalidArgumentException(
                     QueryBuilder::class . " does not support relations, you need " . Builder::class . " for that."
                 );
@@ -65,7 +65,6 @@ class ArrayBuilder
     protected function buildWheres($queryBuilder, array $wheres, $boolean = 'and')
     {
         foreach ($wheres as $whereField => $where) {
-
             if (!isset($whereField) || !isset($where)) {
                 continue;
             }
@@ -74,8 +73,8 @@ class ArrayBuilder
 
             // Nested OR where
             // Example: 'or' => ['foo' => 'bar', 'x => 'y']
-            if($whereField === 'or'){
-                $queryBuilder->whereNested(function($queryBuilder) use ($where){
+            if ($whereField === 'or') {
+                $queryBuilder->whereNested(function ($queryBuilder) use ($where) {
                     $this->buildWheres($queryBuilder, $where, 'or');
                 }, $boolean);
 
@@ -84,8 +83,8 @@ class ArrayBuilder
 
             // Nested AND where
             // Example: 'and' => ['foo' => 'bar', 'x => 'y']
-            if($whereField === 'and'){
-                $queryBuilder->whereNested(function($queryBuilder) use ($where){
+            if ($whereField === 'and') {
+                $queryBuilder->whereNested(function ($queryBuilder) use ($where) {
                     $this->buildWheres($queryBuilder, $where, 'and');
                 }, $boolean);
 
@@ -94,7 +93,7 @@ class ArrayBuilder
 
             // Operator is present on query
             // Example: 'foo' => ['like' => '%bar%']
-            if(is_array($where)){
+            if (is_array($where)) {
                 foreach ($where as $whereOperator => $whereValue) {
                     $whereOperator = $this->parseOperator($whereOperator);
                     $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue, $boolean);
@@ -112,7 +111,6 @@ class ArrayBuilder
 
             $this->buildWhere($queryBuilder, $whereField, $whereOperator, $whereValue, $boolean);
         }
-
     }
 
     /**
@@ -129,21 +127,25 @@ class ArrayBuilder
             return;
         }
 
-        switch($operator){
+        switch ($operator) {
             case 'between':
-                $queryBuilder->whereBetween($field, [$value[0], $value[1]], $boolean); return;
+                $queryBuilder->whereBetween($field, [$value[0], $value[1]], $boolean);
+                return;
             case 'not null':
-                $queryBuilder->whereNotNull($field, $boolean); return;
+                $queryBuilder->whereNotNull($field, $boolean);
+                return;
             case 'in':
-                $queryBuilder->whereIn($field, (!is_array($value) ? [$value] : $value), $boolean); return;
+                $queryBuilder->whereIn($field, (!is_array($value) ? [$value] : $value), $boolean);
+                return;
             case 'not in':
-                $queryBuilder->whereNotIn($field, (!is_array($value) ? [$value] : $value), $boolean); return;
+                $queryBuilder->whereNotIn($field, (!is_array($value) ? [$value] : $value), $boolean);
+                return;
             case 'search':
-                $this->buildTextSearchWhere($queryBuilder, $field, $value, $boolean); return;
+                $this->buildTextSearchWhere($queryBuilder, $field, $value, $boolean);
+                return;
             default:
                 $queryBuilder->where($field, $operator, $value, $boolean);
         }
-
     }
 
     /**
@@ -161,7 +163,7 @@ class ArrayBuilder
      */
     protected function buildOrderBy($queryBuilder, $order)
     {
-        if(is_array($order)){
+        if (is_array($order)) {
             foreach ($order as $orderItem) {
                 $this->buildOrderBySingle($queryBuilder, $orderItem);
             }
@@ -195,7 +197,6 @@ class ArrayBuilder
         $builtIncludes = [];
 
         foreach ($includes as $includeName => $include) {
-
             // Support for array includes, example: ['user', 'post']
             // If it's a single dimension array the key will be numeric
             $includeName = is_numeric($includeName) ? $include : $includeName;
@@ -218,7 +219,6 @@ class ArrayBuilder
                 if (isset($include['order'])) {
                     $this->buildOrderBy($query, $include['order']);
                 }
-
             };
         }
 
@@ -279,11 +279,11 @@ class ArrayBuilder
     {
         $grammar = $queryBuilder->getGrammar();
 
-        if($grammar instanceof MySqlGrammar){
+        if ($grammar instanceof MySqlGrammar) {
             return "COLLATE UTF8_GENERAL_CI LIKE";
         }
 
-        if($grammar instanceof PostgresGrammar){
+        if ($grammar instanceof PostgresGrammar) {
             return "ilike";
         }
 

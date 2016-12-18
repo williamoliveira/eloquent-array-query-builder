@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests;
+
 use Mockery as m;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -9,7 +10,8 @@ use Williamoliveira\ArrayQueryBuilder\ArrayBuilder;
 class ArrayBuilderTest extends AbstractTestCase
 {
 
-    public function testEmptyQuery(){
+    public function testEmptyQuery()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([]);
 
         $fluentQueryBuilder = $this->getQueryBuilder();
@@ -17,7 +19,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testBasicWhere(){
+    public function testBasicWhere()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'where' => [
                 'foo' => 'bar'
@@ -30,7 +33,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testWhereLike(){
+    public function testWhereLike()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'where' => [
                 'name' => ['like' => '%joao%']
@@ -43,7 +47,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testWhereILike(){
+    public function testWhereILike()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'where' => [
                 'name' => ['ilike' => '%joao%']
@@ -56,7 +61,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testWhereBetween(){
+    public function testWhereBetween()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'where' => [
                 'created_at' => [
@@ -74,7 +80,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testWhereOr(){
+    public function testWhereOr()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'where' => [
                 'or' => [
@@ -85,7 +92,7 @@ class ArrayBuilderTest extends AbstractTestCase
         ]);
 
         $fluentQueryBuilder = $this->getQueryBuilder()
-            ->whereNested(function (QueryBuilder $query){
+            ->whereNested(function (QueryBuilder $query) {
                 $query->orWhere('foo', 'bar');
                 $query->orWhere('baz', 'qux');
             });
@@ -93,7 +100,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testWhereAnd(){
+    public function testWhereAnd()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'where' => [
                 'and' => [
@@ -104,7 +112,7 @@ class ArrayBuilderTest extends AbstractTestCase
         ]);
 
         $fluentQueryBuilder = $this->getQueryBuilder()
-            ->whereNested(function (QueryBuilder $query){
+            ->whereNested(function (QueryBuilder $query) {
                 $query->where('foo', 'bar');
                 $query->where('baz', 'qux');
             });
@@ -112,7 +120,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testSelectFields(){
+    public function testSelectFields()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'fields' => ['id', 'name', 'created_at']
         ]);
@@ -123,7 +132,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testOrderBySingleField(){
+    public function testOrderBySingleField()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'order' => 'name',
         ]);
@@ -134,7 +144,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testOrderByManyFields(){
+    public function testOrderByManyFields()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'order' => ['id', 'name'],
         ]);
@@ -147,7 +158,8 @@ class ArrayBuilderTest extends AbstractTestCase
     }
 
 
-    public function testOrderBySingleFieldWithDirection(){
+    public function testOrderBySingleFieldWithDirection()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'order' => 'name ASC',
         ]);
@@ -158,7 +170,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testOrderByManyFieldsWithDirection(){
+    public function testOrderByManyFieldsWithDirection()
+    {
         $arrayQueryBuilder = $this->buildArrayQuery([
             'order' => ['id ASC', 'name DESC'],
         ]);
@@ -170,7 +183,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testBasicInclude(){
+    public function testBasicInclude()
+    {
         $arrayQueryBuilder = $this->buildArrayQueryFromEloquent([
             'include' => ['foo', 'bar']
         ]);
@@ -181,7 +195,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testIncludeWithWhere(){
+    public function testIncludeWithWhere()
+    {
         $arrayQueryBuilder = $this->buildArrayQueryFromEloquent([
             'include' => [
                 'roles' => [
@@ -194,7 +209,7 @@ class ArrayBuilderTest extends AbstractTestCase
 
         $fluentQueryBuilder = $this->getEloquentBuilder()
             ->with([
-                'roles' => function (QueryBuilder $query){
+                'roles' => function (QueryBuilder $query) {
                     $query->where('name', 'admin');
                 }
             ]);
@@ -202,7 +217,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testComplexIncludes(){
+    public function testComplexIncludes()
+    {
         $arrayQueryBuilder = $this->buildArrayQueryFromEloquent([
             'include' => [
                 'permissions' => true,
@@ -219,7 +235,7 @@ class ArrayBuilderTest extends AbstractTestCase
         $fluentQueryBuilder = $this->getEloquentBuilder()
             ->with([
                 'permission' => true,
-                'roles' => function (QueryBuilder $query){
+                'roles' => function (QueryBuilder $query) {
                     $query->select('id', 'name')
                         ->where('name', 'admin')
                         ->orderBy('name', 'DESC');
@@ -229,7 +245,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testComplexQueryFromReadmeExample(){
+    public function testComplexQueryFromReadmeExample()
+    {
         $arrayQueryBuilder = $this->buildArrayQueryFromEloquent([
             'where' => [
                 'name' => ['like' => '%joao%'],
@@ -263,13 +280,13 @@ class ArrayBuilderTest extends AbstractTestCase
             ->orderBy('name')
             ->where('name', 'like', '%joao%')
             ->whereBetween('created_at', ['2014-10-10', '2015-10-10'])
-            ->whereNested(function (QueryBuilder $query){
+            ->whereNested(function (QueryBuilder $query) {
                 $query->orWhere('foo', 'bar');
                 $query->orWhere('baz', 'qux');
             })
             ->with([
                 'permission' => true,
-                'roles' => function (QueryBuilder $query){
+                'roles' => function (QueryBuilder $query) {
                     $query->select('id', 'name')
                         ->where('name', 'admin')
                         ->orderBy('name', 'DESC');
@@ -280,7 +297,8 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
-    public function testArrayBuilderDoesNotAcceptsQueryBuilderWithIncludes(){
+    public function testArrayBuilderDoesNotAcceptsQueryBuilderWithIncludes()
+    {
         $this->expectException(\InvalidArgumentException::class);
 
         $this->buildArrayQuery([
@@ -292,7 +310,8 @@ class ArrayBuilderTest extends AbstractTestCase
      * @param EloquentBuilder|QueryBuilder $query1
      * @param EloquentBuilder|QueryBuilder $query2
      */
-    protected function assertQueryEquals($query1, $query2){
+    protected function assertQueryEquals($query1, $query2)
+    {
         $queryComponents1 = $this->toQueryComponentsArray($query1);
         $queryComponents2 = $this->toQueryComponentsArray($query2);
 
@@ -303,7 +322,8 @@ class ArrayBuilderTest extends AbstractTestCase
      * @param array $arrayQuery
      * @return QueryBuilder
      */
-    protected function buildArrayQuery($arrayQuery){
+    protected function buildArrayQuery($arrayQuery)
+    {
         return (new ArrayBuilder())->apply($this->getQueryBuilder(), $arrayQuery);
     }
 
@@ -311,7 +331,8 @@ class ArrayBuilderTest extends AbstractTestCase
      * @param array $arrayQuery
      * @return EloquentBuilder|QueryBuilder
      */
-    protected function buildArrayQueryFromEloquent($arrayQuery){
+    protected function buildArrayQueryFromEloquent($arrayQuery)
+    {
         return (new ArrayBuilder())->apply($this->getEloquentBuilder(), $arrayQuery);
     }
 
@@ -342,8 +363,9 @@ class ArrayBuilderTest extends AbstractTestCase
      * @param EloquentBuilder|QueryBuilder $query
      * @return array
      */
-    protected function toQueryComponentsArray($query){
-        if($query instanceof EloquentBuilder){
+    protected function toQueryComponentsArray($query)
+    {
+        if ($query instanceof EloquentBuilder) {
             $query = $query->getQuery();
         }
 
@@ -373,5 +395,4 @@ class ArrayBuilderTest extends AbstractTestCase
         // TODO: improve? this is very hacky
         return json_decode(json_encode($rawQueryComponents), true);
     }
-
 }
