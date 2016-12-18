@@ -28,7 +28,7 @@ class ArrayBuilder
      * @param Builder|QueryBuilder $query
      * @param array $arrayQuery
      * @return Builder|QueryBuilder
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function apply($query, array $arrayQuery)
     {
@@ -115,9 +115,9 @@ class ArrayBuilder
 
     /**
      * @param Builder|QueryBuilder $queryBuilder
-     * @param $field
-     * @param $operator
-     * @param $value
+     * @param string $field
+     * @param string|null $operator
+     * @param array|string $value
      * @param string $boolean
      */
     protected function buildWhere($queryBuilder, $field, $operator, $value, $boolean = 'and')
@@ -159,7 +159,7 @@ class ArrayBuilder
 
     /**
      * @param Builder|QueryBuilder $queryBuilder
-     * @param $order
+     * @param array|string $order
      */
     protected function buildOrderBy($queryBuilder, $order)
     {
@@ -176,7 +176,7 @@ class ArrayBuilder
 
     /**
      * @param Builder|QueryBuilder $queryBuilder
-     * @param $order
+     * @param string $order
      */
     protected function buildOrderBySingle($queryBuilder, $order)
     {
