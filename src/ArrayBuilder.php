@@ -4,8 +4,6 @@ namespace Williamoliveira\ArrayQueryBuilder;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\Query\Grammars\MySqlGrammar;
-use Illuminate\Database\Query\Grammars\PostgresGrammar;
 
 class ArrayBuilder
 {
@@ -25,13 +23,22 @@ class ArrayBuilder
     ];
 
     /**
-     * @param Builder $query
+     * @param Builder|QueryBuilder $query
      * @param array $arrayQuery
-     *
-     * @return QueryBuilder
+     * @return Builder|QueryBuilder
+     * @throws \Exception
      */
     public function apply($query, array $arrayQuery)
     {
+        if (isset($arrayQuery['include'])) {
+            if($query instanceof QueryBuilder){
+                throw new \InvalidArgumentException(
+                    QueryBuilder::class . " does not support relations, you need " . Builder::class . " for that."
+                );
+            }
+
+            $this->buildIncludes($query, $arrayQuery['include']);
+        }
 
         if (isset($arrayQuery['where'])) {
             $this->buildWheres($query, $arrayQuery['where']);
@@ -43,10 +50,6 @@ class ArrayBuilder
 
         if (isset($arrayQuery['order'])) {
             $this->buildOrderBy($query, $arrayQuery['order']);
-        }
-
-        if (isset($arrayQuery['include'])) {
-            $this->buildIncludes($query, $arrayQuery['include']);
         }
 
         return $query;
@@ -64,7 +67,7 @@ class ArrayBuilder
             if (!isset($whereField) || !isset($where)) {
                 continue;
             }
-            
+
             $whereField = strtolower($whereField);
 
             // Nested OR where
@@ -123,7 +126,7 @@ class ArrayBuilder
             $this->buildWhereHas($queryBuilder, $field, $operator, $value, $boolean);
             return;
         }
-        
+
         switch($operator){
             case 'between':
                 $queryBuilder->whereBetween($field, [$value[0], $value[1]], $boolean); return;
@@ -182,7 +185,7 @@ class ArrayBuilder
     }
 
     /**
-     * @param Builder|QueryBuilder $queryBuilder
+     * @param Builder $queryBuilder
      * @param array $includes
      */
     protected function buildIncludes($queryBuilder, array $includes)
@@ -231,7 +234,7 @@ class ArrayBuilder
         $value = preg_replace('/\s\s+/', ' ', trim($value));
         $value = '%' . str_replace(' ', '%', $value) . '%';
 
-        $queryBuilder->where($field, $this->getILike($queryBuilder), $value, $boolean);
+        $queryBuilder->where($field, 'ilike', $value, $boolean);
     }
 
     /**
@@ -266,22 +269,4 @@ class ArrayBuilder
         return strtolower($operator);
     }
 
-    /**
-     * @param Builder|QueryBuilder $queryBuilder
-     * @return string
-     */
-    protected function getILike($queryBuilder)
-    {
-        $grammar = $queryBuilder->getGrammar();
-        
-        if($grammar instanceof MySqlGrammar){
-            return "COLLATE UTF8_GENERAL_CI LIKE";
-        }
-
-        if($grammar instanceof PostgresGrammar){
-            return "ilike";
-        }
-
-        return 'like';
-    }
 }

@@ -9,11 +9,21 @@
         }
     ],
     "require": {
-        "illuminate/database": "<=5.2"
+        "illuminate/database": "<=5.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~5.4",
+        "mockery/mockery": "~0.9.4",
+        "symfony/var-dumper": "^3.2"
     },
     "autoload": {
         "psr-4": {
             "Williamoliveira\\ArrayQueryBuilder\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
         }
     }
 }
