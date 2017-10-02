@@ -53,6 +53,17 @@ class ArrayBuilder
         if (isset($arrayQuery['order'])) {
             $this->buildOrderBy($query, $arrayQuery['order']);
         }
+        
+        if (isset($arrayQuery['limit'])) {
+            $this->buildLimit($query, $arrayQuery['limit']);
+        }
+        
+        if (isset($arrayQuery['offset'])) {
+            $this->buildOffset($query, $arrayQuery['offset']);
+        } elseif (isset($arrayQuery['skip'])) {
+            // "skip" is an alias for "offset"
+            $this->buildOffset($query, $arrayQuery['skip']);
+        }
 
         return $query;
     }
@@ -288,5 +299,23 @@ class ArrayBuilder
         }
 
         return 'like';
+    }
+    
+    /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @param int                  $limit
+     */
+    protected function buildLimit($queryBuilder, $limit)
+    {
+        $queryBuilder->limit($limit);
+    }
+    
+    /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @param int                  $offset
+     */
+    protected function buildOffset($queryBuilder, $offset)
+    {
+        $queryBuilder->offset($offset);
     }
 }
