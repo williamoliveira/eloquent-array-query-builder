@@ -8,7 +8,7 @@ use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Williamoliveira\ArrayQueryBuilder\ArrayBuilder;
@@ -231,6 +231,42 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
+    public function testLimit()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'limit' => 15,
+        ]);
+
+        $fluentQueryBuilder = $this->getQueryBuilder()
+            ->limit(15);
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
+    public function testOffset()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'offset' => 5,
+        ]);
+
+        $fluentQueryBuilder = $this->getQueryBuilder()
+            ->offset(5);
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
+    public function testSkip()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'skip' => 5,
+        ]);
+
+        $fluentQueryBuilder = $this->getQueryBuilder()
+            ->offset(5);
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
     public function testBasicInclude()
     {
         $arrayQueryBuilder = $this->buildArrayQueryFromEloquent([
@@ -391,13 +427,12 @@ class ArrayBuilderTest extends AbstractTestCase
     protected function getQueryBuilder($grammar = null)
     {
         $grammar = $grammar ?: new Grammar;
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
-        return new QueryBuilder(
-            m::mock(ConnectionInterface::class),
-            $grammar,
-            $processor
-        );
+        /** @var ConnectionInterface $connection */
+        $connection = Mockery::mock(ConnectionInterface::class);
+
+        return new QueryBuilder($connection, $grammar, $processor);
     }
 
     /**
