@@ -30,7 +30,7 @@ You can also use the ArrayQueryable trait in your model:
 ```php
  // Model
  class User extends Model{
-     use \Williamoliveira\ArrayQueryBuilder\ArrayQueryable;
+     use \Williamoliveira\ArrayQueryBuilder\Traits\ArrayQueryable;
  // ...
 
  // Usage
