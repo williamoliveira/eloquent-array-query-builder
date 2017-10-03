@@ -90,5 +90,5 @@ The same query as a query string:
 &include[roles][fields][]=name
 &include[roles][order]=name DESC
 &offset=5
-$limit=15
+&limit=15
 ```
