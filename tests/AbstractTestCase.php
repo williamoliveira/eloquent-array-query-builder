@@ -3,13 +3,13 @@
 namespace Tests;
 
 use PHPUnit_Framework_TestCase;
-use Mockery as m;
+use Mockery;
 
 abstract class AbstractTestCase extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
-        m::close();
+        Mockery::close();
         parent::tearDown();
     }
 
