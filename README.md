@@ -67,7 +67,9 @@ $exampleArrayQuery = [
             'fields' => ['id', 'name'],
             'order' => 'name DESC'
         ]
-    ]
+    ],
+    'offset' => 5,
+    'limit' => 15,
 ];
 ```
 
@@ -87,4 +89,6 @@ The same query as a query string:
 &include[roles][fields][]=id
 &include[roles][fields][]=name
 &include[roles][order]=name DESC
+&offset=5
+$limit=15
 ```
