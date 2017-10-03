@@ -5,7 +5,7 @@
 
 ## Why this nonsence?
 
-So you can have easy to use filters to filter your data, without the need to write long conditional queries by hand, very useful for APIs.
+So you can have easy to use filters to filter your data, without the need to write long conditional queries by hand, very useful for REST APIs.
 
 ## How to install
 
@@ -20,9 +20,9 @@ public function index(Request $request, \Williamoliveira\ArrayQueryBuilder\Array
 {
     $query = User::query();
     $query = $arrayBuilder->apply($query, $request->all());
-    
-    return $query->paginate($request->get('per_page')); // Note it does not do pagination,
-                                                        // you need to do it youserlf
+
+    return $query->paginate($request->get('per_page')); // Note it does not do pagination or call get(),
+                                                        // you need to do it yourself
 }
 ```
 
@@ -48,13 +48,13 @@ $exampleArrayQuery = [
         'created_at' => [
             'between'  => [
                  '2014-10-10',
-                 '2015-10-10'
-            ]
+                 '2015-10-10',
+            ],
         ],
         'or' => [                             // nested boolean where clauses
             'foo' => 'bar',
-            'baz' => 'qux'
-        ]
+            'baz' => 'qux',
+        ],
     ],
     'fields' => ['id', 'name', 'created_at'],
     'order' => 'name',
@@ -62,20 +62,26 @@ $exampleArrayQuery = [
         'permissions' => true,
         'roles' => [
             'where' => [
-                'name' => 'admin'
+                'name' => 'admin',
             ],
             'fields' => ['id', 'name'],
-            'order' => 'name DESC'
-        ]
+            'order' => 'name DESC',
+        ],
+    ],
+    'groupBy' => ['foo', 'bar', 'baz'],
+    'having' => [
+        'foo' => 'x',
+        'bar' => ['in' => ['1', '2']],
+        'baz' => ['neq' => '3'],
     ],
     'offset' => 5,
     'limit' => 15,
 ];
 ```
 
-The same query as a query string:
+Just as a reference to people building REST APIs, the same query as a query string:
 ```
-/your-route?where[name][like]=%joao%
+?where[name][like]=%joao%
 &where[created_at][between][]=2014-10-10
 &where[created_at][between][]=2015-10-10
 &where[or][foo]=bar
@@ -89,6 +95,29 @@ The same query as a query string:
 &include[roles][fields][]=id
 &include[roles][fields][]=name
 &include[roles][order]=name DESC
+&groupBy[]=foo
+&groupBy[]=bar
+&groupBy[]=baz
+&having[foo]=x
+&having[bar][in][]=1
+&having[bar][in][]=2
+&having[baz][neq]=3
 &offset=5
 &limit=15
+```
+
+#### Where/Having operators aliases
+
+```
+'eq' => '=',
+'neq' => '<>',
+'gt' => '>',
+'gte' => '>=',
+'lt' => '<',
+'lte' => '<=',
+'nlike' => 'not like',
+'nin' => 'not in',
+'notnull' => 'not null',
+'nn' => 'not null',
+'inq' => 'in'
 ```

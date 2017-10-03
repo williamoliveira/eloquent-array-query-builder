@@ -329,6 +329,62 @@ class ArrayBuilderTest extends AbstractTestCase
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
+    public function testGroupBySingle()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'groupBy' => 'foo',
+        ]);
+
+        $fluentQueryBuilder = $this->getQueryBuilder()
+            ->groupBy('foo');
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
+    public function testGroupByArray()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'groupBy' => ['foo', 'bar', 'baz'],
+        ]);
+
+        $fluentQueryBuilder = $this->getQueryBuilder()
+            ->groupBy(['foo', 'bar', 'baz']);
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
+    public function testHavingBasic()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'having' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $fluentQueryBuilder = $this->getQueryBuilder()
+            ->having('foo', '=', 'bar', 'and');
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
+    public function testHavingMany()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'having' => [
+                'foo' => 'x',
+                'bar' => ['nin' => ['1', '2']],
+                'baz' => ['neq' => '3'],
+            ],
+        ]);
+
+        $fluentQueryBuilder = $this->getQueryBuilder()
+            ->having('foo', '=', 'x', 'and')
+            ->having('bar', 'not in', ['1', '2'], 'and')
+            ->having('baz', '<>', '3', 'and');
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
     public function testComplexQueryFromReadmeExample()
     {
         $arrayQueryBuilder = $this->buildArrayQueryFromEloquent([
@@ -356,7 +412,7 @@ class ArrayBuilderTest extends AbstractTestCase
                     'fields' => ['id', 'name'],
                     'order' => 'name DESC'
                 ]
-            ]
+            ],
         ]);
 
         $fluentQueryBuilder = $this->getEloquentBuilder()

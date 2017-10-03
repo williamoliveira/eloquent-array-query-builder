@@ -53,16 +53,27 @@ class ArrayBuilder
         if (isset($arrayQuery['order'])) {
             $this->buildOrderBy($query, $arrayQuery['order']);
         }
-        
+
         if (isset($arrayQuery['limit'])) {
             $this->buildLimit($query, $arrayQuery['limit']);
         }
-        
+
         if (isset($arrayQuery['offset'])) {
             $this->buildOffset($query, $arrayQuery['offset']);
         } elseif (isset($arrayQuery['skip'])) {
             // "skip" is an alias for "offset"
             $this->buildOffset($query, $arrayQuery['skip']);
+        }
+
+        if (isset($arrayQuery['groupBy'])) {
+            $this->buildGroupBy($query, $arrayQuery['groupBy']);
+        } elseif (isset($arrayQuery['group_by'])) {
+            // "group_by" is an alias for "groupBy"
+            $this->buildGroupBy($query, $arrayQuery['group_by']);
+        }
+
+        if (isset($arrayQuery['having'])) {
+            $this->buildHavings($query, $arrayQuery['having']);
         }
 
         return $query;
@@ -200,6 +211,24 @@ class ArrayBuilder
     }
 
     /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @param int $limit
+     */
+    protected function buildLimit($queryBuilder, $limit)
+    {
+        $queryBuilder->limit($limit);
+    }
+
+    /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @param int $offset
+     */
+    protected function buildOffset($queryBuilder, $offset)
+    {
+        $queryBuilder->offset($offset);
+    }
+
+    /**
      * @param Builder $queryBuilder
      * @param array $includes
      */
@@ -270,6 +299,54 @@ class ArrayBuilder
     }
 
     /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @param string|array $groupBy
+     */
+    protected function buildGroupBy($queryBuilder, $groupBy)
+    {
+        $queryBuilder->groupBy($groupBy);
+    }
+
+    /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @param array $havings
+     * @param string $boolean
+     */
+    protected function buildHavings($queryBuilder, array $havings, $boolean = 'and')
+    {
+        foreach ($havings as $havingField => $having) {
+            if (!isset($havingField) || !isset($having)) {
+                continue;
+            }
+
+            $havingField = strtolower($havingField);
+
+            // Operator is omitted on query, assumes '='
+            // Example: 'foo' => 'bar'
+            $havingOperator = is_array($having) ? array_keys($having)[0] : '=';
+            $havingValue = is_array($having) ? $having[$havingOperator] : $having;
+
+            $havingOperator = $this->parseOperator($havingOperator);
+
+            $this->buildHaving($queryBuilder, $havingField, $havingOperator, $havingValue, $boolean);
+        }
+    }
+
+    /**
+     * @param Builder|QueryBuilder $queryBuilder
+     * @param string $havingField
+     * @param string $havingOperator
+     * @param string $havingValue
+     * @param string $boolean
+     *
+     * @internal param array|string $having
+     */
+    protected function buildHaving($queryBuilder, $havingField, $havingOperator, $havingValue, $boolean)
+    {
+        $queryBuilder->having($havingField, $havingOperator, $havingValue, $boolean);
+    }
+
+    /**
      * @param string $operator
      * @return string
      */
@@ -300,22 +377,5 @@ class ArrayBuilder
 
         return 'like';
     }
-    
-    /**
-     * @param Builder|QueryBuilder $queryBuilder
-     * @param int                  $limit
-     */
-    protected function buildLimit($queryBuilder, $limit)
-    {
-        $queryBuilder->limit($limit);
-    }
-    
-    /**
-     * @param Builder|QueryBuilder $queryBuilder
-     * @param int                  $offset
-     */
-    protected function buildOffset($queryBuilder, $offset)
-    {
-        $queryBuilder->offset($offset);
-    }
+
 }
