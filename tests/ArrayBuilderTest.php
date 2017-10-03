@@ -2,6 +2,12 @@
 
 namespace Tests;
 
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Grammars\MySqlGrammar;
+use Illuminate\Database\Query\Grammars\PostgresGrammar;
+use Illuminate\Database\Query\Processors\Processor;
+use InvalidArgumentException;
 use Mockery as m;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -57,6 +63,48 @@ class ArrayBuilderTest extends AbstractTestCase
 
         $fluentQueryBuilder = $this->getQueryBuilder()
             ->where('name', 'ilike', '%joao%');
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
+    public function testWhereSearchForPostgres()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'where' => [
+                'name' => ['search' => 'joao']
+            ],
+        ], new PostgresGrammar());
+
+        $fluentQueryBuilder = $this->getQueryBuilder(new PostgresGrammar())
+            ->where('name', 'ilike', '%joao%');
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
+    public function testWhereSearchForMysql()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'where' => [
+                'name' => ['search' => 'joao']
+            ],
+        ], new MySqlGrammar());
+
+        $fluentQueryBuilder = $this->getQueryBuilder(new MySqlGrammar())
+            ->where('name', 'COLLATE UTF8_GENERAL_CI LIKE', '%joao%');
+
+        $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
+    }
+
+    public function testWhereSearchDefault()
+    {
+        $arrayQueryBuilder = $this->buildArrayQuery([
+            'where' => [
+                'name' => ['search' => 'joao']
+            ],
+        ]);
+
+        $fluentQueryBuilder = $this->getQueryBuilder()
+            ->where('name', 'like', '%joao%');
 
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
@@ -293,13 +341,12 @@ class ArrayBuilderTest extends AbstractTestCase
                 }
             ]);
 
-
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
 
     public function testArrayBuilderDoesNotAcceptsQueryBuilderWithIncludes()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->buildArrayQuery([
             'include' => ['foo', 'bar']
@@ -320,11 +367,12 @@ class ArrayBuilderTest extends AbstractTestCase
 
     /**
      * @param array $arrayQuery
+     * @param Grammar|null $grammar
      * @return QueryBuilder
      */
-    protected function buildArrayQuery($arrayQuery)
+    protected function buildArrayQuery($arrayQuery, $grammar = null)
     {
-        return (new ArrayBuilder())->apply($this->getQueryBuilder(), $arrayQuery);
+        return (new ArrayBuilder())->apply($this->getQueryBuilder($grammar), $arrayQuery);
     }
 
     /**
@@ -337,15 +385,16 @@ class ArrayBuilderTest extends AbstractTestCase
     }
 
     /**
+     * @param Grammar|null $grammar
      * @return QueryBuilder
      */
-    protected function getQueryBuilder()
+    protected function getQueryBuilder($grammar = null)
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
-        $processor = m::mock(\Illuminate\Database\Query\Processors\Processor::class);
+        $grammar = $grammar ?: new Grammar;
+        $processor = m::mock(Processor::class);
 
         return new QueryBuilder(
-            m::mock(\Illuminate\Database\ConnectionInterface::class),
+            m::mock(ConnectionInterface::class),
             $grammar,
             $processor
         );
