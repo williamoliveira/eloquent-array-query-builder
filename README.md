@@ -5,7 +5,7 @@
 
 ## Why this nonsence?
 
-So you can have easy to use filters to filter your data, without the need to write long conditional queries by hand, very useful for REST APIs.
+So you can have easy to use query "language" to query your data, without the need to write long conditional queries by hand, very useful for REST APIs.
 
 ## How to install
 
