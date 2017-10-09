@@ -105,7 +105,7 @@ Just as a reference to people building REST APIs, the same query as a query stri
 &offset=5
 &limit=15
 ```
-Tip: for Javascript you can create a querystring using [Qs](https://github.com/ljharb/qs).
+Tip: for Javascript you can create a query string using [Qs](https://github.com/ljharb/qs).
 
 #### Where/Having operators aliases
 
