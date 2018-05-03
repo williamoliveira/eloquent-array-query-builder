@@ -90,7 +90,7 @@ class ArrayBuilderTest extends AbstractTestCase
         ], new MySqlGrammar());
 
         $fluentQueryBuilder = $this->getQueryBuilder(new MySqlGrammar())
-            ->where('name', 'COLLATE UTF8_GENERAL_CI LIKE', '%joao%');
+            ->whereRaw('`name` COLLATE utf8_general_ci like ?', ['%joao%']);
 
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
@@ -104,7 +104,7 @@ class ArrayBuilderTest extends AbstractTestCase
         ]);
 
         $fluentQueryBuilder = $this->getQueryBuilder()
-            ->where('name', 'like', '%joao%');
+            ->whereRaw('lower("name") like ?', ['%joao%']);
 
         $this->assertQueryEquals($fluentQueryBuilder, $arrayQueryBuilder);
     }
@@ -532,7 +532,6 @@ class ArrayBuilderTest extends AbstractTestCase
             }
         }
 
-        // TODO: improve? this is very hacky
         return json_decode(json_encode($rawQueryComponents), true);
     }
 }

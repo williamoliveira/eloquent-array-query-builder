@@ -274,9 +274,29 @@ class ArrayBuilder
     protected function buildTextSearchWhere($queryBuilder, $field, $value, $boolean = 'and')
     {
         $value = preg_replace('/\s\s+/', ' ', trim($value));
-        $value = '%' . str_replace(' ', '%', $value) . '%';
+        $value = '%' . strtolower(str_replace(' ', '%', $value)) . '%';
 
-        $queryBuilder->where($field, $this->getILike($queryBuilder), $value, $boolean);
+        $theQueryBuilder = $queryBuilder instanceof Builder
+            ? $queryBuilder->getQuery()
+            : $queryBuilder;
+        $grammar = $theQueryBuilder->getGrammar();
+
+        // Postgres
+        if ($grammar instanceof PostgresGrammar) {
+            $queryBuilder->where($field, 'ilike', $value, $boolean);
+            return;
+        }
+
+        $column = $grammar->wrap($field);
+
+        // MySql
+        if ($grammar instanceof MySqlGrammar) {
+            $queryBuilder->whereRaw($column . ' COLLATE utf8_general_ci like ?', [$value], $boolean);
+            return;
+        }
+
+        // Others
+        $queryBuilder->whereRaw('lower(' . $column . ') like ?', [$value], $boolean);
     }
 
     /**
@@ -358,24 +378,4 @@ class ArrayBuilder
 
         return strtolower($operator);
     }
-
-    /**
-     * @param Builder|QueryBuilder $queryBuilder
-     * @return string
-     */
-    protected function getILike($queryBuilder)
-    {
-        $grammar = $queryBuilder->getGrammar();
-
-        if ($grammar instanceof MySqlGrammar) {
-            return "COLLATE UTF8_GENERAL_CI LIKE";
-        }
-
-        if ($grammar instanceof PostgresGrammar) {
-            return "ilike";
-        }
-
-        return 'like';
-    }
-
 }

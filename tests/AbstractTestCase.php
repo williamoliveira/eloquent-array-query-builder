@@ -2,10 +2,10 @@
 
 namespace Tests;
 
-use PHPUnit_Framework_TestCase;
 use Mockery;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractTestCase extends PHPUnit_Framework_TestCase
+abstract class AbstractTestCase extends TestCase
 {
     public function tearDown()
     {
