@@ -3,7 +3,7 @@
 [![Total Downloads](https://poser.pugx.org/williamoliveira/eloquent-array-query-builder/downloads)](https://packagist.org/packages/williamoliveira/eloquent-array-query-builder)
 [![License](https://poser.pugx.org/williamoliveira/eloquent-array-query-builder/license)](https://packagist.org/packages/williamoliveira/eloquent-array-query-builder)
 
-## Why this nonsence?
+## Why this nonsense?
 
 So you can have easy to use query "language" to query your data, without the need to write long conditional queries by hand, very useful for REST APIs.
 
