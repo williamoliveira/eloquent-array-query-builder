@@ -46,6 +46,14 @@ class ArrayBuilder
             $this->buildWheres($query, $arrayQuery['where']);
         }
 
+        if (isset($arrayQuery['has'])) {
+            $this->buildHas($query, $arrayQuery['has']);
+        }
+
+        if (isset($arrayQuery['scope'])) {
+            $this->buildScope($query, $arrayQuery['scope']);
+        }
+
         if (isset($arrayQuery['fields'])) {
             $this->buildFields($query, $arrayQuery['fields']);
         }
@@ -364,6 +372,32 @@ class ArrayBuilder
     protected function buildHaving($queryBuilder, $havingField, $havingOperator, $havingValue, $boolean)
     {
         $queryBuilder->having($havingField, $havingOperator, $havingValue, $boolean);
+    }
+
+    /**
+     * @param $queryBuilder
+     * @param $relationships
+     */
+    protected function buildHas($queryBuilder, $relationships)
+    {
+        if (is_array($relationships))
+            foreach ($relationships as $relationship)
+                $queryBuilder->has($relationship);
+        else
+            $queryBuilder->has($relationships);
+    }
+
+    /**
+     * @param $queryBuilder
+     * @param $scopes
+     */
+    protected function buildScope($queryBuilder, $scopes)
+    {
+        if (is_array($scopes))
+            foreach ($scopes as $scope)
+                $queryBuilder->$scope();
+        else
+            $queryBuilder->$scopes();
     }
 
     /**
