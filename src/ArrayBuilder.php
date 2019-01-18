@@ -380,11 +380,13 @@ class ArrayBuilder
      */
     protected function buildHas($queryBuilder, $relationships)
     {
-        if (is_array($relationships))
-            foreach ($relationships as $relationship)
+        if (is_array($relationships)) {
+            foreach ($relationships as $relationship) {
                 $queryBuilder->has($relationship);
-        else
+            }
+        } else {
             $queryBuilder->has($relationships);
+        }
     }
 
     /**
@@ -393,11 +395,13 @@ class ArrayBuilder
      */
     protected function buildScope($queryBuilder, $scopes)
     {
-        if (is_array($scopes))
-            foreach ($scopes as $scope)
+        if (is_array($scopes)) {
+            foreach ($scopes as $scope) {
                 $queryBuilder->$scope();
-        else
+            }
+        } else {
             $queryBuilder->$scopes();
+        }
     }
 
     /**
