@@ -50,8 +50,8 @@ class ArrayBuilder
             $this->buildHas($query, $arrayQuery['has']);
         }
 
-        if (isset($arrayQuery['scope'])) {
-            $this->buildScope($query, $arrayQuery['scope']);
+        if (isset($arrayQuery['scopes'])) {
+            $this->buildScopes($query, $arrayQuery['scope']);
         }
 
         if (isset($arrayQuery['fields'])) {
@@ -393,14 +393,29 @@ class ArrayBuilder
      * @param $queryBuilder
      * @param $scopes
      */
-    protected function buildScope($queryBuilder, $scopes)
+    protected function buildScopes($queryBuilder, $scopes)
     {
         if (is_array($scopes)) {
             foreach ($scopes as $scope) {
-                $queryBuilder->$scope();
+                $this->buildScope($queryBuilder, $scope);
             }
         } else {
-            $queryBuilder->$scopes();
+            $this->buildScope($queryBuilder, $scopes);
+        }
+    }
+
+    /**
+     * @param $queryBuilder
+     * @param $scopes
+     */
+    protected function buildScope($queryBuilder, $scope)
+    {
+        if (property_exists(QueryBuilder::class, 'validScopes') && in_array($scope, $this->validScopes)) {
+            $queryBuilder->$scope();
+        } else {
+            throw new \InvalidArgumentException(
+                "$scope is not listed in the " . QueryBuilder::class . " \$validScopes protected array."
+            );
         }
     }
 

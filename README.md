@@ -56,7 +56,7 @@ $exampleArrayQuery = [
             'baz' => 'qux',
         ],
     ],
-    'scope' => 'hotAndPopular',
+    'scopes' => 'hotAndPopular',
     'has' => ['comments', 'author'],
     'fields' => ['id', 'name', 'created_at'],
     'order' => 'name',
@@ -88,7 +88,7 @@ Just as a reference to people building REST APIs, the same query as a query stri
 &where[created_at][between][]=2015-10-10
 &where[or][foo]=bar
 &where[or][baz]=qux
-&scope=hotAndPopular
+&scopes=hotAndPopular
 &has[]=comments
 &has[]=author
 &fields[]=id
