@@ -205,9 +205,20 @@ class ArrayBuilder
         $order = strtolower($order);
 
         $orderBy = str_replace([' asc', ' desc'], '', $order);
-        $orderDirection = ends_with($order, ' desc') ? 'desc' : 'asc';
+        $orderDirection = $this->ends_with($order, ' desc') ? 'desc' : 'asc';
 
         $queryBuilder->orderBy($orderBy, $orderDirection);
+    }
+
+    protected function ends_with($haystack, $needles)
+    {
+        foreach ((array) $needles as $needle) {
+            if (substr($haystack, -strlen($needle)) === (string) $needle) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
