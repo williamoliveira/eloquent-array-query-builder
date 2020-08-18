@@ -46,6 +46,14 @@ class ArrayBuilder
             $this->buildWheres($query, $arrayQuery['where']);
         }
 
+        if (isset($arrayQuery['has'])) {
+            $this->buildHas($query, $arrayQuery['has']);
+        }
+
+        if (isset($arrayQuery['scopes'])) {
+            $this->buildScopes($query, $arrayQuery['scope']);
+        }
+
         if (isset($arrayQuery['fields'])) {
             $this->buildFields($query, $arrayQuery['fields']);
         }
@@ -375,6 +383,51 @@ class ArrayBuilder
     protected function buildHaving($queryBuilder, $havingField, $havingOperator, $havingValue, $boolean)
     {
         $queryBuilder->having($havingField, $havingOperator, $havingValue, $boolean);
+    }
+
+    /**
+     * @param $queryBuilder
+     * @param $relationships
+     */
+    protected function buildHas($queryBuilder, $relationships)
+    {
+        if (is_array($relationships)) {
+            foreach ($relationships as $relationship) {
+                $queryBuilder->has($relationship);
+            }
+        } else {
+            $queryBuilder->has($relationships);
+        }
+    }
+
+    /**
+     * @param $queryBuilder
+     * @param $scopes
+     */
+    protected function buildScopes($queryBuilder, $scopes)
+    {
+        if (is_array($scopes)) {
+            foreach ($scopes as $scope) {
+                $this->buildScope($queryBuilder, $scope);
+            }
+        } else {
+            $this->buildScope($queryBuilder, $scopes);
+        }
+    }
+
+    /**
+     * @param $queryBuilder
+     * @param $scopes
+     */
+    protected function buildScope($queryBuilder, $scope)
+    {
+        if (property_exists(QueryBuilder::class, 'validScopes') && in_array($scope, $this->validScopes)) {
+            $queryBuilder->$scope();
+        } else {
+            throw new \InvalidArgumentException(
+                "$scope is not listed in the " . QueryBuilder::class . " \$validScopes protected array."
+            );
+        }
     }
 
     /**
